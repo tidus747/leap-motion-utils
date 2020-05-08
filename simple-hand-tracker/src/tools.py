@@ -20,6 +20,7 @@ Iván Rodríguez (irodrigu@ull.es) - 2020
 '''
 
 from datetime import datetime
+from matplotlib import pyplot as plt
 
 # Declaración de funciones
 
@@ -43,8 +44,15 @@ class trackedObj:
     self.first_hand_pos = [0,0,0]
     self.second_hand_pos = [0,0,0]
 
+    self.data_plot = False
+    self.figure = 0
+    self.ax = 0
+    self.line_x_y = 0
+
   def show_data(self):
+    ''' Función para mostrar toda la información guardada en la clase '''
     print("Frame ID: {}, Timestamp: {}, Hands Count: {}, Extended Fingers: {}, Hand Type: {}, First Hand Pos: ({},{},{}), Hand Type: {}, Second Hand Pos: ({},{},{})".format(self.frame_id, self.timestamp, self.hands_count, self.extended_fingers, self.hand_type[0], self.first_hand_pos[0],self.first_hand_pos[1],self.first_hand_pos[2], self.hand_type[1], self.second_hand_pos[0],self.second_hand_pos[1],self.second_hand_pos[2]))
+
   def update_data(self, tracking_results):
     ''' Función para actualizar los datos del track '''
     parameters = tracking_results.split()
@@ -79,3 +87,28 @@ class trackedObj:
         self.hand_type = [str(parameters[4]),str(parameters[8])]
         self.first_hand_pos = [float(parameters[5][1:-2]),float(parameters[6][:-2]),float(parameters[7][:-2])]
         self.second_hand_pos = [float(parameters[9][1:-2]),float(parameters[10][:-2]),float(parameters[11][:-2])]
+
+  def plot(self):
+   ''' Función para representar la localización espacial de la detección '''
+
+   if (self.data_plot == False):
+       # Creamos el gráfico la primera vez
+       plt.ion()
+
+       self.figure = plt.figure()
+       self.ax = self.figure.add_subplot(111)
+
+       self.ax.set_title("Localización XY")
+       self.ax.set_xlim(-200,200)
+       self.ax.set_ylim(-200,200)
+
+       self.line_x_y, = self.ax.plot(self.first_hand_pos[0],self.first_hand_pos[1], 'ro')
+
+       self.data_plot = True
+
+   else:
+       self.line_x_y.set_xdata(self.first_hand_pos[0])
+       self.line_x_y.set_ydata(self.first_hand_pos[1])
+
+       self.figure.canvas.draw()
+       self.figure.canvas.flush_events()

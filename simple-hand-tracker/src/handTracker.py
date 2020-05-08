@@ -38,9 +38,10 @@ else:
 
 while(True):
   tracking_results = MyPopen.stdout.readline().strip()
-  
+
   track.update_data(tracking_results.decode('ascii'))
   track.show_data()
+  #track.plot()
 
   if (keyboard.is_pressed("ENTER")):
       # Si se pulsa ENTER se saldrá del programa
