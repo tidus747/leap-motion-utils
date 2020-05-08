@@ -24,20 +24,25 @@ import keyboard, os, sys
 import tools as t
 from subprocess import Popen, PIPE
 
-CPP_COMPILED_PATH = './handTracker'
+CPP_COMPILED_PATH = './handTracker' # Nombre que tiene el código fuente compilado
 
 # Abrimos el tracker escrito en C++ una vez compilado
 if (os.path.exists(CPP_COMPILED_PATH)):
     t.log_msg("INFO","Fichero ejecutable encontrado!")
     MyPopen = Popen([CPP_COMPILED_PATH], shell=True, stdout=PIPE, stdin=PIPE)
+    # Creamos el objeto para los datos del tracking
+    track = t.trackedObj()
 else:
     t.log_msg("ERROR","Fichero ejecutable ("+CPP_COMPILED_PATH+") no encontrado!")
     sys.exit()
 
-while(1):
+while(True):
   tracking_results = MyPopen.stdout.readline().strip()
-  print(tracking_results)
+  
+  track.update_data(tracking_results.decode('ascii'))
+  track.show_data()
 
   if (keyboard.is_pressed("ENTER")):
       # Si se pulsa ENTER se saldrá del programa
+      t.log_msg("INFO","Saliendo del programa...")
       break
